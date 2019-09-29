@@ -1,26 +1,64 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
+import db from "./components/index.js";
 
-function App() {
+import 'rbx/index.css';
+import {Card, Column, Image, Level, Content, Button, Divider} from 'rbx';
+
+const ProductCard = ({ product }) => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Card key={product.sku}>
+      <Card.Image>
+        <Image.Container>
+          <Image src={require('../public/data/products/'+product.sku+'_1.jpg')}/>
+        </Image.Container>
+      </Card.Image>
+      <Card.Content align="center">
+        <Content style={{fontSize:"17px"}}>
+          {product.title}
+          <Divider style={{marginTop:"12px", marginBottom:"12px"}}/>
+          ${parseFloat(product.price).toFixed(2)}
+        </Content>
+      </Card.Content>
+      <Card.Footer>
+        <Card.Footer.Item>
+          <Button.Group>
+            {["S","M","L","XL"].map(size => (
+              <Button>{size}</Button>
+            ))}
+          </Button.Group>
+        </Card.Footer.Item>
+      </Card.Footer>
+    </Card>
+  )
 }
+
+const App = () => {
+  const [data, setData] = useState({});
+  const products = Object.values(data);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const response = await fetch('./data/products.json');
+      const json = await response.json();
+      setData(json);
+    };
+    fetchProducts();
+  }, []);
+
+  return (
+    <Column.Group style={{marginTop:"10px", marginLeft:"20px", marginRight:"20px"}}>
+      {[1, 2, 3, 4].map(i => (
+        <Column key={i}>          
+            {products.slice(4*(i-1), 4*i).map(product => 
+            <Level style={{display:"flex"}}>
+              <ProductCard product={product}/>
+            </Level>)}
+        </Column>
+      ))}
+    </Column.Group>
+  );
+};
 
 export default App;
