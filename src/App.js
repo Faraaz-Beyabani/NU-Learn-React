@@ -10,17 +10,11 @@ import {Card, Column, Image, Level, Content, Button, Divider, Navbar, Media, Tit
 
 import Sidebar from "react-sidebar";
 
-const useCart = () => {
-  const [cartContents, setCartContents] = useState([]);
-  const updateCart = (cart, item) => {
-    cart.push(item);
-    setCartContents(cart);
-  }
-  return [cartContents, updateCart];
-}
+const ProductCard = ({ product, state }) => {
+  var setCartOpen = Object.values(state)[1];
+  var cartContents = Object.values(state)[2];
+  var setCartContents = Object.values(state)[3];
 
-const ProductCard = ({ product }) => {
-  const [cartContents, setCartContents] = useCart();
 
   return (
     <Card key={product.sku}>
@@ -40,7 +34,8 @@ const ProductCard = ({ product }) => {
         <Card.Footer.Item>
           <Button.Group>
             {["S","M","L","XL"].map(size => (
-              <Button onClick={() => setCartContents(cartContents, product)}>{size}</Button>
+              <Button onClick={() => {setCartOpen(true); console.log(cartContents); 
+                cartContents.push(product); console.log(cartContents); setCartContents(cartContents);}}>{size}</Button>
             ))}
           </Button.Group>
         </Card.Footer.Item>
@@ -50,8 +45,6 @@ const ProductCard = ({ product }) => {
 };
 
 const CartCard = ({ product }) => {
-  console.log("made a cartCard!!");
-
   return (
     <Card>
       <Card.Content>
@@ -90,7 +83,7 @@ const App = () => {
   }, []);
 
   const [cartOpen, setCartOpen] = useState(false);
-  const [cartContents, setCartContents] = useCart();
+  const [cartContents, setCartContents] = useState([]);
 
   return (
     <React.Fragment>
@@ -119,7 +112,7 @@ const App = () => {
       <Sidebar open={cartOpen} pullRight={true} styles={{ sidebar: { background: "black" } }}
       sidebar={cartContents.map(cartItem => (
         <Level>
-          <CartCard product={cartContents}/>
+          <CartCard product={cartItem}/>
         </Level>
       ))}/>
 
@@ -128,7 +121,7 @@ const App = () => {
           <Column key={i}>          
             {products.slice(4*(i-1), 4*i).map(product => 
             <Level>
-              <ProductCard product={product}/>
+              <ProductCard state={{cartOpen, setCartOpen, cartContents, setCartContents}} product={product}/>
             </Level>)}
           </Column>
         ))}
