@@ -5,7 +5,7 @@ import 'firebase/database';
 import db from "./components/index.js";
 
 import 'rbx/index.css';
-import {Card, Column, Image, Level, Content, Button, Divider} from 'rbx';
+import {Card, Column, Image, Level, Content, Button, Divider, Navbar} from 'rbx';
 
 const ProductCard = ({ product }) => {
   return (
@@ -48,16 +48,39 @@ const App = () => {
   }, []);
 
   return (
-    <Column.Group style={{marginTop:"10px", marginLeft:"20px", marginRight:"20px"}}>
-      {[1, 2, 3, 4].map(i => (
-        <Column key={i}>          
+    <React.Fragment>
+      <Navbar fixed="top">
+        <Navbar.Brand>
+          <Navbar.Item>
+            Shopping Cart
+          </Navbar.Item>
+        </Navbar.Brand>
+        <Navbar.Menu>
+          <Navbar.Segment align="end">
+            <Navbar.Item>
+              <Button>
+                Login
+              </Button>
+            </Navbar.Item>
+            <Navbar.Item>
+              <Button>
+              🛒
+              </Button>
+            </Navbar.Item>
+          </Navbar.Segment>
+        </Navbar.Menu>
+      </Navbar>
+      <Column.Group style={{marginTop:"10px", marginLeft:"20px", marginRight:"20px"}}>
+        {[1, 2, 3, 4].map(i => (
+          <Column key={i}>          
             {products.slice(4*(i-1), 4*i).map(product => 
             <Level style={{display:"flex"}}>
               <ProductCard product={product}/>
             </Level>)}
-        </Column>
-      ))}
-    </Column.Group>
+          </Column>
+        ))}
+      </Column.Group>
+    </React.Fragment>
   );
 };
 
