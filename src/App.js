@@ -50,7 +50,7 @@ const CartCard = ({ product }) => {
       <Card.Content>
         <Media>
           <Media.Item as="figure" align="left">
-            <Image.Container as="p" size={64}>
+            <Image.Container as="p" size={50}>
               <Image
                 src={require('../public/data/products/'+product.sku+'_2.jpg')}
               />
@@ -61,7 +61,7 @@ const CartCard = ({ product }) => {
               {product.title}
             </Title>
             <Title as="p" subtitle size={6}>
-              {product.price}
+              ${parseFloat(product.price).toFixed(2)}
             </Title>
           </Media.Item>
         </Media>
@@ -109,7 +109,7 @@ const App = () => {
         </Navbar.Menu>
       </Navbar>
 
-      <Sidebar open={cartOpen} pullRight={true} styles={{ sidebar: { background: "black" } }}
+      <Sidebar open={cartOpen} pullRight={true} styles={{ sidebar: { paddingTop:"53px", background: "white", position:"fixed" } }}
       sidebar={cartContents.map(cartItem => (
         <Level>
           <CartCard product={cartItem}/>
