@@ -34,8 +34,7 @@ const ProductCard = ({ product, state }) => {
         <Card.Footer.Item>
           <Button.Group>
             {["S","M","L","XL"].map(size => (
-              <Button onClick={() => {setCartOpen(true); console.log(cartContents); 
-                cartContents.push(product); console.log(cartContents); setCartContents(cartContents);}}>{size}</Button>
+              <Button onClick={() => {setCartOpen(true); cartContents.push({product, size}); setCartContents(cartContents);}}>{size}</Button>
             ))}
           </Button.Group>
         </Card.Footer.Item>
@@ -44,14 +43,14 @@ const ProductCard = ({ product, state }) => {
   );
 };
 
-const CartCard = ({ product }) => {
+const CartCard = ({ product, size }) => {
   return (
-    <Card>
+    <Card style={{width:"475px", height:"100px"}}>
       <Card.Content>
         <Media>
-          <Media.Item as="figure" align="left">
-            <Image.Container as="p" size={50}>
-              <Image
+          <Media.Item as="figure" align="left" style={{position:"relative", bottom:"24px"}}>
+            <Image.Container>
+              <Image style={{height:"100px"}}
                 src={require('../public/data/products/'+product.sku+'_2.jpg')}
               />
             </Image.Container>
@@ -61,7 +60,7 @@ const CartCard = ({ product }) => {
               {product.title}
             </Title>
             <Title as="p" subtitle size={6}>
-              ${parseFloat(product.price).toFixed(2)}
+              {size} - ${parseFloat(product.price).toFixed(2)}
             </Title>
           </Media.Item>
         </Media>
@@ -90,7 +89,7 @@ const App = () => {
       <Navbar fixed="top">
         <Navbar.Brand>
           <Navbar.Item>
-            Shopping Cart
+            Shirt Store
           </Navbar.Item>
         </Navbar.Brand>
         <Navbar.Menu>
@@ -102,7 +101,7 @@ const App = () => {
             </Navbar.Item>
             <Navbar.Item>
               <Button onClick={() => setCartOpen(!cartOpen)}>
-              🛒
+                🛒
               </Button>
             </Navbar.Item>
           </Navbar.Segment>
@@ -112,7 +111,7 @@ const App = () => {
       <Sidebar open={cartOpen} pullRight={true} styles={{ sidebar: { paddingTop:"53px", background: "white", position:"fixed" } }}
       sidebar={cartContents.map(cartItem => (
         <Level>
-          <CartCard product={cartItem}/>
+          <CartCard product={Object.values(cartItem)[0]} size={Object.values(cartItem)[1]}/>
         </Level>
       ))}/>
 
