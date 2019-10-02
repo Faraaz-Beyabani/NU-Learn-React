@@ -90,6 +90,8 @@ const App = () => {
 
   const [cartOpen, setCartOpen] = useState(false);
   const [cartContents, setCartContents] = useState([]);
+  var totalPrice = 0.0;
+  cartContents.forEach((item) => {totalPrice += item.product.price * item.count})
 
   return (
     <React.Fragment>
@@ -116,13 +118,18 @@ const App = () => {
       </Navbar>
 
       <Sidebar open={cartOpen} pullRight={true} styles={{ sidebar: { paddingTop:"53px", background: "white", position:"fixed" } }}
-      sidebar={cartContents.map(cartItem => (
-        <Level>
-          <CartCard product={cartItem.product} 
-                    size={cartItem.size} 
-                    count={cartItem.count}/>
-        </Level>
-      ))}/>
+      sidebar={
+        <React.Fragment>
+          ${parseFloat(totalPrice).toFixed(2)}
+          {cartContents.map(cartItem => (
+            <Level>
+              <CartCard product={cartItem.product} 
+                        size={cartItem.size} 
+                        count={cartItem.count}/>
+            </Level>
+          ))}
+        </React.Fragment>
+        }/>
 
       <Column.Group style={{marginTop:"10px", marginLeft:"20px", marginRight:"20px"}}>
         {[1, 2, 3, 4].map(i => (
