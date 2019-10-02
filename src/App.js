@@ -34,7 +34,14 @@ const ProductCard = ({ product, state }) => {
         <Card.Footer.Item>
           <Button.Group>
             {["S","M","L","XL"].map(size => (
-              <Button onClick={() => {setCartOpen(true); cartContents.push({product, size}); setCartContents(cartContents);}}>{size}</Button>
+              <Button onClick={() => {setCartOpen(true);
+                                      let productIndex = cartContents.findIndex((item) => {console.log(item); console.log(product); console.log(size); return item.product === product && item.size === size});
+                                      productIndex !== -1
+                                      ? cartContents[productIndex].count++
+                                      : cartContents.push({product: product, size: size, count: 1}); 
+                                      setCartContents(cartContents);}}>
+                {size}
+              </Button>
             ))}
           </Button.Group>
         </Card.Footer.Item>
@@ -43,7 +50,7 @@ const ProductCard = ({ product, state }) => {
   );
 };
 
-const CartCard = ({ product, size }) => {
+const CartCard = ({ product, size, count }) => {
   return (
     <Card style={{width:"475px", height:"100px"}}>
       <Card.Content>
@@ -60,7 +67,7 @@ const CartCard = ({ product, size }) => {
               {product.title}
             </Title>
             <Title as="p" subtitle size={6}>
-              {size} - ${parseFloat(product.price).toFixed(2)}
+              {count} x {size} - ${parseFloat(count*product.price).toFixed(2)}
             </Title>
           </Media.Item>
         </Media>
@@ -111,7 +118,9 @@ const App = () => {
       <Sidebar open={cartOpen} pullRight={true} styles={{ sidebar: { paddingTop:"53px", background: "white", position:"fixed" } }}
       sidebar={cartContents.map(cartItem => (
         <Level>
-          <CartCard product={Object.values(cartItem)[0]} size={Object.values(cartItem)[1]}/>
+          <CartCard product={cartItem.product} 
+                    size={cartItem.size} 
+                    count={cartItem.count}/>
         </Level>
       ))}/>
 
