@@ -117,10 +117,16 @@ const App = () => {
         </Navbar.Menu>
       </Navbar>
 
-      <Sidebar open={cartOpen} pullRight={true} styles={{ sidebar: { paddingTop:"53px", background: "white", position:"fixed" } }}
+      <Sidebar overlayClassName={"overlay"} open={cartOpen} onSetOpen={() => setCartOpen(false)} pullRight={true} styles={{ sidebar: { paddingTop:"53px", background: "white", position:"fixed" } }}
       sidebar={
         <React.Fragment>
-          ${parseFloat(totalPrice).toFixed(2)}
+          <Level>
+            <Card style={{width:"475px", height:"100px"}}>
+              <Card.Content>
+                ${parseFloat(totalPrice).toFixed(2)}
+              </Card.Content>
+            </Card>
+          </Level>
           {cartContents.map(cartItem => (
             <Level>
               <CartCard product={cartItem.product} 
@@ -130,6 +136,10 @@ const App = () => {
           ))}
         </React.Fragment>
         }/>
+
+      <div className={"overlay"} onClick={() => console.log("fuck")}>
+        
+      </div>
 
       <Column.Group style={{marginTop:"10px", marginLeft:"20px", marginRight:"20px"}}>
         {[1, 2, 3, 4].map(i => (
