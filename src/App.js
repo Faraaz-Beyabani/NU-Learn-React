@@ -52,7 +52,7 @@ const ProductCard = ({ product, state }) => {
 
 const CartCard = ({ product, size, count }) => {
   return (
-    <Card style={{width:"475px", height:"100px"}}>
+    <Card style={{width:"350px", height:"100px"}}>
       <Card.Content>
         <Media>
           <Media.Item as="figure" align="left" style={{position:"relative", bottom:"24px"}}>
@@ -63,7 +63,7 @@ const CartCard = ({ product, size, count }) => {
             </Image.Container>
           </Media.Item>
           <Media.Item>
-            <Title as="p" size={4}>
+            <Title as="p" size={6}>
               {product.title}
             </Title>
             <Title as="p" subtitle size={6}>
@@ -117,11 +117,11 @@ const App = () => {
         </Navbar.Menu>
       </Navbar>
 
-      <Sidebar overlayClassName={"overlay"} open={cartOpen} onSetOpen={() => setCartOpen(false)} pullRight={true} styles={{ sidebar: { paddingTop:"53px", background: "white", position:"fixed" } }}
+      <Sidebar overlayClassName={"overlay"} open={cartOpen} onSetOpen={() => setCartOpen(false)} pullRight={true} styles={{ sidebar: { paddingTop:"53px", width:"300px", background: "white", position:"fixed" } }}
       sidebar={
         <React.Fragment>
           <Level>
-            <Card style={{width:"475px", height:"100px"}}>
+            <Card style={{position:"fixed", width:"350px", height:"100px"}}>
               <Card.Content>
                 ${parseFloat(totalPrice).toFixed(2)}
               </Card.Content>
