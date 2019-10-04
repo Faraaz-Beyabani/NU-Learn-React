@@ -127,7 +127,7 @@ const App = () => {
         </Navbar.Menu>
       </Navbar>
 
-      <Sidebar overlayClassName={"overlay"} open={cartOpen} onSetOpen={() => setCartOpen(false)} pullRight={true} styles={{ sidebar: { paddingTop:"53px", width:"300px", background: "white", position:"fixed" } }}
+      <Sidebar overlayClassName={"overlay"} open={cartOpen} onSetOpen={() => setCartOpen(false)} pullRight={true} styles={{ sidebar: { transition:"left .1s, right .1s", WebkitTransition: "-webkit-transform .1s ease-out", paddingTop:"53px", width:"300px", background: "white", position:"fixed" } }}
       sidebar={
         <React.Fragment>
           <Level>
