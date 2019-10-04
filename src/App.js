@@ -34,8 +34,8 @@ const ProductCard = ({ product, state }) => {
         <Card.Footer.Item>
           <Button.Group>
             {["S","M","L","XL"].map(size => (
-              <Button onClick={() => {setCartOpen(true);
-                                      let productIndex = cartContents.findIndex((item) => {console.log(item); console.log(product); console.log(size); return item.product === product && item.size === size});
+              <Button key={size} onClick={() => {setCartOpen(true);
+                                      let productIndex = cartContents.findIndex((item) => {return item.product === product && item.size === size});
                                       productIndex !== -1
                                       ? cartContents[productIndex].count++
                                       : cartContents.push({product: product, size: size, count: 1}); 
@@ -50,24 +50,33 @@ const ProductCard = ({ product, state }) => {
   );
 };
 
-const CartCard = ({ product, size, count }) => {
+const CartCard = ({ index, state }) => {
+
+  var cart = state.cart;
+  var setCart = state.setCart;
+
   return (
     <Card style={{width:"350px", height:"100px"}}>
+      <Card.Header>
+        <Button onClick={() => {let newCart = cart; newCart[index].count--; setCart(cart.filter((cartItem) => {return cartItem.count > 0})); }}>
+          ❌
+        </Button>
+      </Card.Header>
       <Card.Content>
         <Media>
           <Media.Item as="figure" align="left" style={{position:"relative", bottom:"24px"}}>
             <Image.Container>
               <Image style={{height:"100px"}}
-                src={require('../public/data/products/'+product.sku+'_2.jpg')}
+                src={require('../public/data/products/'+cart[index].product.sku+'_2.jpg')}
               />
             </Image.Container>
           </Media.Item>
           <Media.Item>
             <Title as="p" size={6}>
-              {product.title}
+              {cart[index].product.title}
             </Title>
             <Title as="p" subtitle size={6}>
-              {count} x {size} - ${parseFloat(count*product.price).toFixed(2)}
+              {cart[index].count} x {cart[index].size} - ${parseFloat(cart[index].count*cart[index].product.price).toFixed(2)}
             </Title>
           </Media.Item>
         </Media>
@@ -90,6 +99,7 @@ const App = () => {
 
   const [cartOpen, setCartOpen] = useState(false);
   const [cartContents, setCartContents] = useState([]);
+
   var totalPrice = 0.0;
   cartContents.forEach((item) => {totalPrice += item.product.price * item.count})
 
@@ -121,25 +131,21 @@ const App = () => {
       sidebar={
         <React.Fragment>
           <Level>
-            <Card style={{position:"fixed", width:"350px", height:"100px"}}>
+            <Card style={{width:"350px", height:"100px"}}>
               <Card.Content>
                 ${parseFloat(totalPrice).toFixed(2)}
               </Card.Content>
             </Card>
           </Level>
-          {cartContents.map(cartItem => (
+          {cartContents.map((cartItem, index) => (
             <Level>
-              <CartCard product={cartItem.product} 
-                        size={cartItem.size} 
-                        count={cartItem.count}/>
+              <CartCard key={index}
+                        index={index}
+                        state={{cart: cartContents, setCart: setCartContents}}/>
             </Level>
           ))}
         </React.Fragment>
         }/>
-
-      <div className={"overlay"} onClick={() => console.log("fuck")}>
-        
-      </div>
 
       <Column.Group style={{marginTop:"10px", marginLeft:"20px", marginRight:"20px"}}>
         {[1, 2, 3, 4].map(i => (
