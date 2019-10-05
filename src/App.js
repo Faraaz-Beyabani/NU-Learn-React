@@ -16,6 +16,7 @@ const ProductCard = ({ product, state }) => {
   var cartContents = state.cart;
   var setCartContents = state.setCart;
   var inv = state.stock;
+  var setInv = state.setStock;
 
 
   return (
@@ -35,7 +36,7 @@ const ProductCard = ({ product, state }) => {
       <Card.Footer>
         <Card.Footer.Item>
           <Button.Group>
-            {["S","M","L","XL"].filter((key) => {return inv[key]>0}).map(size => (
+            {["S","M","L","XL"].filter((key) => {return inv[product.sku][key]>0}).map(size => (
               <Button key={size} onClick={() => {setCartOpen(true);
                                       let productIndex = cartContents.findIndex((item) => {return item.product === product && item.size === size});
                                       productIndex !== -1
@@ -164,7 +165,7 @@ const App = () => {
           <Column key={i}>          
             {products.slice(4*(i-1), 4*i).map(product => 
             <Level>
-              <ProductCard state={{open: cartOpen, setOpen: setCartOpen, cart: cartContents, setCart: setCartContents, stock: inv[product.sku]}} product={product}/>
+              <ProductCard state={{open: cartOpen, setOpen: setCartOpen, cart: cartContents, setCart: setCartContents, stock: inv, setStock: setInv}} product={product}/>
             </Level>)}
           </Column>
         ))}
