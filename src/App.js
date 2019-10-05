@@ -9,11 +9,13 @@ import 'rbx/index.css';
 import {Card, Column, Image, Level, Content, Button, Divider, Navbar, Media, Title} from 'rbx';
 
 import Sidebar from "react-sidebar";
+import { initialValue } from 'rbx/components/modal/modal-context';
 
 const ProductCard = ({ product, state }) => {
-  var setCartOpen = Object.values(state)[1];
-  var cartContents = Object.values(state)[2];
-  var setCartContents = Object.values(state)[3];
+  var setCartOpen = state.setOpen;
+  var cartContents = state.cart;
+  var setCartContents = state.setCart;
+  var inv = state.stock;
 
 
   return (
@@ -33,7 +35,7 @@ const ProductCard = ({ product, state }) => {
       <Card.Footer>
         <Card.Footer.Item>
           <Button.Group>
-            {["S","M","L","XL"].map(size => (
+            {["S","M","L","XL"].filter((key) => {return inv[key]>0}).map(size => (
               <Button key={size} onClick={() => {setCartOpen(true);
                                       let productIndex = cartContents.findIndex((item) => {return item.product === product && item.size === size});
                                       productIndex !== -1
@@ -97,6 +99,17 @@ const App = () => {
     fetchProducts();
   }, []);
 
+  const [inv, setInv] = useState({});
+  const inventory = Object.values(inv);
+  useEffect(() => {
+    const fetchInv = async () => {
+      const response = await fetch('./data/inventory.json');
+      const json = await response.json();
+      setInv(json);
+    };
+    fetchInv();
+  }, [])
+
   const [cartOpen, setCartOpen] = useState(false);
   const [cartContents, setCartContents] = useState([]);
 
@@ -152,7 +165,7 @@ const App = () => {
           <Column key={i}>          
             {products.slice(4*(i-1), 4*i).map(product => 
             <Level>
-              <ProductCard state={{cartOpen, setCartOpen, cartContents, setCartContents}} product={product}/>
+              <ProductCard state={{open: cartOpen, setOpen: setCartOpen, cart: cartContents, setCart: setCartContents, stock: inv[product.sku]}} product={product}/>
             </Level>)}
           </Column>
         ))}
