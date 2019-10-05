@@ -9,7 +9,6 @@ import 'rbx/index.css';
 import {Card, Column, Image, Level, Content, Button, Divider, Navbar, Media, Title} from 'rbx';
 
 import Sidebar from "react-sidebar";
-import { initialValue } from 'rbx/components/modal/modal-context';
 
 const ProductCard = ({ product, state }) => {
   var setCartOpen = state.setOpen;
@@ -18,35 +17,43 @@ const ProductCard = ({ product, state }) => {
   var inv = state.stock;
   var setInv = state.setStock;
 
+  var availableSizes = ["S","M","L","XL"].filter((key) => {return inv[product.sku][key]>0});
+
 
   return (
-    <Card key={product.sku}>
+    <Card key={product.sku} style={{height:"100%", display:"flex", flexDirection:"column"}}>
       <Card.Image>
         <Image.Container>
           <Image src={require('../public/data/products/'+product.sku+'_1.jpg')}/>
         </Image.Container>
       </Card.Image>
       <Card.Content align="center">
-        <Content style={{fontSize:"17px"}}>
+        <Content style={{fontSize:"1em"}}>
           {product.title}
-          <Divider style={{marginTop:"12px", marginBottom:"12px"}}/>
+          <Divider style={{}}/>
           ${parseFloat(product.price).toFixed(2)}
         </Content>
       </Card.Content>
-      <Card.Footer>
-        <Card.Footer.Item>
-          <Button.Group>
-            {["S","M","L","XL"].filter((key) => {return inv[product.sku][key]>0}).map(size => (
-              <Button key={size} onClick={() => {setCartOpen(true);
-                                      let productIndex = cartContents.findIndex((item) => {return item.product === product && item.size === size});
-                                      productIndex !== -1
-                                      ? cartContents[productIndex].count++
-                                      : cartContents.push({product: product, size: size, count: 1}); 
-                                      setCartContents(cartContents);}}>
-                {size}
-              </Button>
-            ))}
-          </Button.Group>
+      <Card.Footer style={{height:"60px"}}>
+        <Card.Footer.Item style={{margin:"auto"}}>
+          {availableSizes.length > 0 ?
+            <Button.Group>
+              {["S","M","L","XL"].filter((key) => {return inv[product.sku][key]>0}).map(size => (
+                <Button key={size} onClick={() => {setCartOpen(true);
+                                        let productIndex = cartContents.findIndex((item) => {return item.product === product && item.size === size});
+                                        productIndex !== -1
+                                        ? cartContents[productIndex].count++
+                                        : cartContents.push({product: product, size: size, count: 1});
+                                        let newInv = inv;
+                                        newInv[product.sku][size]--;
+                                        setCartContents(cartContents);
+                                        setInv(newInv);}}>
+                  {size}
+                </Button>
+              ))}
+            </Button.Group> :
+              "Out of Stock"
+          }
         </Card.Footer.Item>
       </Card.Footer>
     </Card>
@@ -58,10 +65,18 @@ const CartCard = ({ index, state }) => {
   var cart = state.cart;
   var setCart = state.setCart;
 
+  var inv = state.inv;
+  var setInv = state.setInv;
+
   return (
     <Card style={{width:"350px", height:"100px"}}>
       <Card.Header>
-        <Button onClick={() => {let newCart = cart; newCart[index].count--; setCart(cart.filter((cartItem) => {return cartItem.count > 0})); }}>
+        <Button onClick={() => {let newInv = inv;
+                                newInv[cart[index].product.sku][cart[index].size]++;
+                                let newCart = cart; 
+                                newCart[index].count--;
+                                setCart(cart.filter((cartItem) => {return cartItem.count > 0}));
+                                setInv(newInv); }}>
           ❌
         </Button>
       </Card.Header>
@@ -93,7 +108,6 @@ const App = () => {
   const products = Object.values(data);
 
   const [inv, setInv] = useState({});
-  const inventory = Object.values(inv);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -154,7 +168,7 @@ const App = () => {
             <Level>
               <CartCard key={index}
                         index={index}
-                        state={{cart: cartContents, setCart: setCartContents}}/>
+                        state={{cart: cartContents, setCart: setCartContents, inv: inv, setInv: setInv}}/>
             </Level>
           ))}
         </React.Fragment>
@@ -162,7 +176,7 @@ const App = () => {
 
       <Column.Group style={{marginTop:"10px", marginLeft:"20px", marginRight:"20px"}}>
         {[1, 2, 3, 4].map(i => (
-          <Column key={i}>          
+          <Column key={i} style={{height:"100%"}}>          
             {products.slice(4*(i-1), 4*i).map(product => 
             <Level>
               <ProductCard state={{open: cartOpen, setOpen: setCartOpen, cart: cartContents, setCart: setCartContents, stock: inv, setStock: setInv}} product={product}/>
