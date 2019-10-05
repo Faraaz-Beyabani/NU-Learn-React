@@ -90,25 +90,24 @@ const CartCard = ({ index, state }) => {
 const App = () => {
   const [data, setData] = useState({});
   const products = Object.values(data);
+
+  const [inv, setInv] = useState({});
+  const inventory = Object.values(inv);
+
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch('./data/products.json');
       const json = await response.json();
       setData(json);
     };
-    fetchProducts();
-  }, []);
-
-  const [inv, setInv] = useState({});
-  const inventory = Object.values(inv);
-  useEffect(() => {
     const fetchInv = async () => {
-      const response = await fetch('./data/inventory.json');
-      const json = await response.json();
-      setInv(json);
+      const responseI = await fetch('./data/inventory.json');
+      const jsonI = await responseI.json();
+      setInv(jsonI);
     };
     fetchInv();
-  }, [])
+    fetchProducts();
+  }, []);
 
   const [cartOpen, setCartOpen] = useState(false);
   const [cartContents, setCartContents] = useState([]);
