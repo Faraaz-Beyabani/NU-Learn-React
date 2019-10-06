@@ -58,7 +58,7 @@ const ProductCard = ({ product, state, user }) => {
                                         ? cartContents[productIndex].count++
                                         : cartContents.push({product: product, size: size, count: 1});
                                         let newInv = inv;
-                                        console.log(--newInv[product.sku][size]);
+                                        --newInv[product.sku][size];
                                         setCartContents(cartContents);
                                         if(user) db.child('cart').child(user.uid).set(cartContents);
                                         setInv(newInv);
@@ -129,7 +129,7 @@ const App = () => {
   const [user, setUser] = useState(null);
 
   const [cartOpen, setCartOpen] = useState(false);
-  const [cartContents, setCartContents] = useState([]);
+  var [cartContents, setCartContents] = useState([]);
 
   useEffect(() => {
     const handleData = snap => {
@@ -152,12 +152,10 @@ const App = () => {
     firebase.auth().onAuthStateChanged(setUser);
   }, []);
 
-  var savedCart;
-
   if(user) {
     db.child("cart/" + user.uid).on('value', snap => {
       if(snap.val()) {
-        savedCart = snap.val();
+        cartContents = snap.val();
       }
     },
     error => alert(error));
@@ -182,7 +180,7 @@ const App = () => {
                 <div style={{paddingRight:"15px"}}>
                   Welcome, {user.displayName}
                 </div>
-                <Button primary onClick={() => firebase.auth().signOut()}>
+                <Button primary onClick={() => {firebase.auth().signOut(); setCartContents([])}}>
                   Log out
                 </Button> 
               </React.Fragment>:
