@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
-import db from "./components/index.js";
+import {db} from "./components/index.js";
 
 import 'rbx/index.css';
 import {Card, Column, Image, Level, Content, Button, Divider, Navbar, Media, Title} from 'rbx';
@@ -16,6 +16,8 @@ const ProductCard = ({ product, state }) => {
   var setCartContents = state.setCart;
   var inv = state.stock;
   var setInv = state.setStock;
+
+  if(Object.values(inv).length === 0) return("");
 
   var availableSizes = ["S","M","L","XL"].filter((key) => {return inv[product.sku][key]>0});
 
@@ -110,17 +112,19 @@ const App = () => {
   const [inv, setInv] = useState({});
 
   useEffect(() => {
+    const handleData = snap => {
+      if(snap.val()) setInv(snap.val());
+    }
+    db.on('value', handleData, error => alert(error));
+    return () => { db.off('value', handleData); };
+  }, []);
+
+  useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch('./data/products.json');
       const json = await response.json();
       setData(json);
     };
-    const fetchInv = async () => {
-      const responseI = await fetch('./data/inventory.json');
-      const jsonI = await responseI.json();
-      setInv(jsonI);
-    };
-    fetchInv();
     fetchProducts();
   }, []);
 
