@@ -3,12 +3,23 @@ import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import {db} from "./components/index.js";
 
 import 'rbx/index.css';
 import {Card, Column, Image, Level, Content, Button, Divider, Navbar, Media, Title} from 'rbx';
 
 import Sidebar from "react-sidebar";
+
+const uiConfig = {
+  signInFlow: 'popup',
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID
+  ],
+  callbacks: {
+    signInSuccessWithAuthResult: () => false
+  }
+};
 
 const ProductCard = ({ product, state }) => {
   var setCartOpen = state.setOpen;
@@ -111,6 +122,11 @@ const App = () => {
 
   const [inv, setInv] = useState({});
 
+  const [user, setUser] = useState(null);
+
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartContents, setCartContents] = useState([]);
+
   useEffect(() => {
     const handleData = snap => {
       if(snap.val()) setInv(snap.val());
@@ -128,8 +144,11 @@ const App = () => {
     fetchProducts();
   }, []);
 
-  const [cartOpen, setCartOpen] = useState(false);
-  const [cartContents, setCartContents] = useState([]);
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(setUser);
+  }, []);
+
+  console.log(user);
 
   var totalPrice = 0.0;
   cartContents.forEach((item) => {totalPrice += item.product.price * item.count})
@@ -145,9 +164,19 @@ const App = () => {
         <Navbar.Menu>
           <Navbar.Segment align="end">
             <Navbar.Item>
-              <Button>
-                Login
-              </Button>
+              {user ? 
+              <React.Fragment>
+                <div style={{paddingRight:"15px"}}>
+                  Welcome, {user.displayName}
+                </div>
+                <Button primary onClick={() => firebase.auth().signOut()}>
+                  Log out
+                </Button> 
+              </React.Fragment>:
+              <StyledFirebaseAuth
+                uiConfig={uiConfig}
+                firebaseAuth={firebase.auth()}
+              /> }
             </Navbar.Item>
             <Navbar.Item>
               <Button onClick={() => setCartOpen(!cartOpen)}>
