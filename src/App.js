@@ -21,7 +21,7 @@ const uiConfig = {
   }
 };
 
-const ProductCard = ({ product, state }) => {
+const ProductCard = ({ product, state, user }) => {
   var setCartOpen = state.setOpen;
   var cartContents = state.cart;
   var setCartContents = state.setCart;
@@ -58,9 +58,11 @@ const ProductCard = ({ product, state }) => {
                                         ? cartContents[productIndex].count++
                                         : cartContents.push({product: product, size: size, count: 1});
                                         let newInv = inv;
-                                        newInv[product.sku][size]--;
+                                        console.log(--newInv[product.sku][size]);
                                         setCartContents(cartContents);
-                                        setInv(newInv);}}>
+                                        if(user) db.child('cart').child(user.uid).set(cartContents);
+                                        setInv(newInv);
+                                        }}>
                   {size}
                 </Button>
               ))}
@@ -73,7 +75,7 @@ const ProductCard = ({ product, state }) => {
   );
 };
 
-const CartCard = ({ index, state }) => {
+const CartCard = ({ index, state, user }) => {
 
   var cart = state.cart;
   var setCart = state.setCart;
@@ -88,7 +90,9 @@ const CartCard = ({ index, state }) => {
                                 newInv[cart[index].product.sku][cart[index].size]++;
                                 let newCart = cart; 
                                 newCart[index].count--;
-                                setCart(cart.filter((cartItem) => {return cartItem.count > 0}));
+                                cart = cart.filter((cartItem) => {return cartItem.count > 0})
+                                setCart(cart);
+                                if(user) db.child('cart').child(user.uid).set(cart);
                                 setInv(newInv); }}>
           ❌
         </Button>
@@ -148,14 +152,23 @@ const App = () => {
     firebase.auth().onAuthStateChanged(setUser);
   }, []);
 
-  console.log(user);
+  var savedCart;
+
+  if(user) {
+    db.child("cart/" + user.uid).on('value', snap => {
+      if(snap.val()) {
+        savedCart = snap.val();
+      }
+    },
+    error => alert(error));
+  }
 
   var totalPrice = 0.0;
   cartContents.forEach((item) => {totalPrice += item.product.price * item.count})
 
   return (
     <React.Fragment>
-      <Navbar fixed="top">
+      <Navbar fixed="top" style={{height:"20px"}}>
         <Navbar.Brand>
           <Navbar.Item>
             Shirt Store
@@ -201,7 +214,8 @@ const App = () => {
             <Level>
               <CartCard key={index}
                         index={index}
-                        state={{cart: cartContents, setCart: setCartContents, inv: inv, setInv: setInv}}/>
+                        state={{cart: cartContents, setCart: setCartContents, inv: inv, setInv: setInv}}
+                        user={user}/>
             </Level>
           ))}
         </React.Fragment>
@@ -212,7 +226,9 @@ const App = () => {
           <Column key={i} style={{height:"100%"}}>          
             {products.slice(4*(i-1), 4*i).map(product => 
             <Level>
-              <ProductCard state={{open: cartOpen, setOpen: setCartOpen, cart: cartContents, setCart: setCartContents, stock: inv, setStock: setInv}} product={product}/>
+              <ProductCard  state={{open: cartOpen, setOpen: setCartOpen, cart: cartContents, setCart: setCartContents, stock: inv, setStock: setInv}} 
+                            product={product}
+                            user={user}/>
             </Level>)}
           </Column>
         ))}
