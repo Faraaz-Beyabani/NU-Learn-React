@@ -11,6 +11,8 @@ import {Card, Column, Image, Level, Content, Button, Divider, Navbar, Media, Tit
 
 import Sidebar from "react-sidebar";
 
+/* git test */
+
 const uiConfig = {
   signInFlow: 'popup',
   signInOptions: [
